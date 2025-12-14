@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spritrechner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Versteckt die Pfeile bei Nummern-Inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Definiert eine Klasse für die zentrierte, gestapelte Ansicht */
+        @media (max-width: 640px) { /* Tailwind's default 'sm' breakpoint */
+            .difference-stacked > input {
+                text-align: center !important; /* Zentriert den Text im Input-Feld */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-4 space-y-4 border-2 border-gray-700">
+        
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-white">Spritrechner</h1>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-2">
+            <label for="kmInput" class="text-xs font-bold text-gray-400 uppercase">Gefahrene Strecke</label>
+            <input type="text" id="kmInput" inputmode="decimal" class="w-full p-2 text-lg rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors" placeholder="Kilometer (km)">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-3">
+                <h2 class="text-lg font-bold text-blue-400 text-center">Verbrenner</h2>
+                <div>
+                    <label for="fuelConsumption" class="block text-xs font-medium text-gray-400 mb-1">Verbrauch (l / 100 km)</label>
+                    <input type="text" id="fuelConsumption" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 9,0">
+                </div>
+                <div>
+                    <label for="fuelPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / l)</label>
+                    <input type="text" id="fuelPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 1,60">
+                </div>
+                <div>
+                    <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Geschätzte Kosten</label>
+                    <input type="text" id="euroOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0,00 €">
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-3">
+                <h2 class="text-lg font-bold text-green-400 text-center">Elektro</h2>
+                <div>
+                    <label for="kwhConsumption" class="block text-xs font-medium text-gray-400 mb-1">Verbrauch (kWh / 100 km)</label>
+                    <input type="text" id="kwhConsumption" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 30,0">
+                </div>
+                <div>
+                    <label for="kwhPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / kWh)</label>
+                    <input type="text" id="kwhPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 0,36">
+                </div>
+                <div>
+                    <label for="euroOutputEv" class="block text-xs font-medium text-gray-400 mb-1">Geschätzte Kosten</label>
+                    <input type="text" id="euroOutputEv" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0,00 €">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-2 difference-stacked">
+            <p id="differenceHeading" class="text-sm font-bold text-yellow-400 uppercase text-center block mb-1">Differenz</p>
+            <input type="text" id="differenceOutput" readonly class="w-full p-2 text-xl text-center rounded-md bg-black text-white font-bold cursor-not-allowed transition-colors" placeholder="Ersparnis wird berechnet...">
+        </div>
+        </div>
+
+    <script>
+        // --- DOM Elements ---
+        const kmInput = document.getElementById('kmInput');
+        // Verbrenner
+        const fuelConsumptionInput = document.getElementById('fuelConsumption');
+        const fuelPriceInput = document.getElementById('fuelPrice');
+        const euroOutput = document.getElementById('euroOutput');
+        // Elektro
+        const kwhConsumptionInput = document.getElementById('kwhConsumption');
+        const kwhPriceInput = document.getElementById('kwhPrice');
+        const euroOutputEv = document.getElementById('euroOutputEv');
+        // Differenz (MODIFIED)
+        const differenceOutput = document.getElementById('differenceOutput');
+        const differenceHeading = document.getElementById('differenceHeading');
+
+        // --- Default values ---
+        const DEFAULT_FUEL_CONSUMPTION = 9.0;
+        const DEFAULT_FUEL_PRICE = 1.60;
+        const DEFAULT_KWH_CONSUMPTION = 30.0;
+        const DEFAULT_KWH_PRICE = 0.36;
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataFromLocalStorage();
+            addEventListeners();
+            calculateAll();
+        });
+
+        /**
+         * Parses a string with a comma as a decimal separator into a float.
+         * @param {string} str The string to parse.
+         * @returns {number} The parsed float, or NaN if parsing fails.
+         */
+        function parseGermanFloat(str) {
+            if (typeof str !== 'string') return NaN;
+            // Erlaubt sowohl Punkt als auch Komma als Eingabe, behandelt aber leere Strings als NaN
+            if (str.trim() === '') return NaN;
+            return parseFloat(str.replace(',', '.'));
+        }
+
+        /**
+         * Formats a number into a string with a comma as a decimal separator.
+         * @param {number} num The number to format.
+         * @param {number} decimals The number of decimal places.
+         * @returns {string} The formatted string.
+         */
+        function formatToGermanString(num, decimals) {
+            if (typeof num !== 'number' || isNaN(num)) return '';
+            return num.toFixed(decimals).replace('.', ',');
+        }
+
+        /**
+         * Adds event listeners to the input fields.
+         */
+        function addEventListeners() {
+            kmInput.addEventListener('input', calculateAndSave);
+            fuelConsumptionInput.addEventListener('input', calculateAndSave);
+            fuelPriceInput.addEventListener('input', calculateAndSave);
+            kwhConsumptionInput.addEventListener('input', calculateAndSave);
+            kwhPriceInput.addEventListener('input', calculateAndSave);
+            
+            // Add blur listeners for auto-formatting
+            fuelConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
+            kwhConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
+            fuelPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
+            kwhPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
+            kmInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
+        }
+
+        /**
+         * Loads saved settings from Local Storage.
+         */
+        function loadDataFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('fuelCalculatorSettings');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    fuelConsumptionInput.value = formatToGermanString(data.fuelConsumption || DEFAULT_FUEL_CONSUMPTION, 1);
+                    fuelPriceInput.value = formatToGermanString(data.fuelPrice || DEFAULT_FUEL_PRICE, 2);
+                    kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
+                    kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
+                    kmInput.value = formatToGermanString(data.km || '', 2); // Load the saved kilometers
+                    console.log("Daten aus dem lokalen Speicher geladen.");
+                } else {
+                    setAllDefaults();
+                    console.log("Keine gespeicherten Daten gefunden, Standardwerte gesetzt.");
+                }
+            } catch (error) {
+                console.error("Fehler beim Laden der Daten aus dem lokalen Speicher:", error);
+                setAllDefaults();
+            }
+        }
+        
+        /** Helper function to set all default values */
+        function setAllDefaults() {
+            fuelConsumptionInput.value = formatToGermanString(DEFAULT_FUEL_CONSUMPTION, 1);
+            fuelPriceInput.value = formatToGermanString(DEFAULT_FUEL_PRICE, 2);
+            kwhConsumptionInput.value = formatToGermanString(DEFAULT_KWH_CONSUMPTION, 1);
+            kwhPriceInput.value = formatToGermanString(DEFAULT_KWH_PRICE, 2);
+        }
+
+        /**
+         * Formats numeric inputs to a fixed number of decimal places on blur.
+         */
+        function formatNumericInput(event, decimals) {
+            const input = event.target;
+            const value = parseGermanFloat(input.value);
+            if (!isNaN(value)) {
+                const formattedValue = formatToGermanString(value, decimals);
+                // Nur aktualisieren und neu berechnen, wenn sich der Wert geändert hat
+                if (input.value && input.value !== formattedValue) {
+                    input.value = formattedValue;
+                    calculateAndSave();
+                }
+            }
+        }
+
+        /**
+         * Saves the current consumption and price settings to Local Storage.
+         */
+        function saveDataToLocalStorage() {
+            try {
+                const dataToSave = {
+                    km: parseGermanFloat(kmInput.value) || null, // Save the kilometers
+                    fuelConsumption: parseGermanFloat(fuelConsumptionInput.value) || null,
+                    fuelPrice: parseGermanFloat(fuelPriceInput.value) || null,
+                    kwhConsumption: parseGermanFloat(kwhConsumptionInput.value) || null,
+                    kwhPrice: parseGermanFloat(kwhPriceInput.value) || null,
+                };
+                
+                localStorage.setItem('fuelCalculatorSettings', JSON.stringify(dataToSave));
+            } catch (error) {
+                console.error("Fehler beim Speichern der Daten im lokalen Speicher:", error);
+            }
+        }
+
+        /**
+         * Calculates costs for the combustion engine car.
+         */
+        function calculateGas() {
+            const kmValue = parseGermanFloat(kmInput.value);
+            const fuelConsumption = parseGermanFloat(fuelConsumptionInput.value);
+            const fuelPrice = parseGermanFloat(fuelPriceInput.value);
+
+            if (!isNaN(kmValue) && !isNaN(fuelConsumption) && !isNaN(fuelPrice) && fuelConsumption > 0 && fuelPrice > 0) {
+                const totalLiters = (kmValue / 100) * fuelConsumption;
+                const totalCost = totalLiters * fuelPrice;
+                euroOutput.value = formatToGermanString(totalCost, 2) + " €";
+            } else {
+                euroOutput.value = '';
+            }
+        }
+        
+        /**
+         * Calculates costs for the electric vehicle.
+         */
+        function calculateEv() {
+            const kmValue = parseGermanFloat(kmInput.value);
+            const kwhConsumption = parseGermanFloat(kwhConsumptionInput.value);
+            const kwhPrice = parseGermanFloat(kwhPriceInput.value);
+
+            if (!isNaN(kmValue) && !isNaN(kwhConsumption) && !isNaN(kwhPrice) && kwhConsumption > 0 && kwhPrice > 0) {
+                const totalKwh = (kmValue / 100) * kwhConsumption;
+                const totalCost = totalKwh * kwhPrice;
+                euroOutputEv.value = formatToGermanString(totalCost, 2) + " €";
+            } else {
+                euroOutputEv.value = '';
+            }
+        }
+
+        /**
+         * Calculates and displays the difference between the two costs. (MODIFIED)
+         */
+        function calculateDifference() {
+            const costGasStr = euroOutput.value;
+            const costEvStr = euroOutputEv.value;
+
+            const costGas = parseGermanFloat(costGasStr.replace('€', '').trim());
+            const costEv = parseGermanFloat(costEvStr.replace('€', '').trim());
+
+            // Reset classes and default heading
+            differenceOutput.classList.remove('text-green-400', 'text-blue-400', 'text-white');
+            differenceHeading.classList.remove('text-green-400', 'text-blue-400', 'text-yellow-400');
+            differenceHeading.textContent = 'Differenz'; // Reset heading text
+            differenceHeading.classList.add('text-yellow-400'); // Default color for "Differenz"
+
+            if (!isNaN(costGas) && !isNaN(costEv)) {
+                const diff = Math.abs(costGas - costEv);
+                let textAmount;
+                let textHeading;
+                let textClass;
+
+                // Calculate the percentage saving based on the higher cost
+                const higherCost = Math.max(costGas, costEv);
+                let percentageText = '';
+                if (higherCost > 0 && diff > 0) {
+                    const percentageSaving = (diff / higherCost) * 100;
+                    percentageText = ` (${formatToGermanString(percentageSaving, 1)}%)`; 
+                }
+                
+                textAmount = formatToGermanString(diff, 2) + ' €' + percentageText;
+
+                if (costGas < costEv) {
+                    textHeading = `Ersparnis Verbrenner`;
+                    textClass = 'text-blue-400';
+                } else if (costEv < costGas) {
+                    textHeading = `Ersparnis Elektro`;
+                    textClass = 'text-green-400';
+                } else {
+                    textHeading = "Kein Kostenunterschied";
+                    textAmount = formatToGermanString(diff, 2) + " €"; // Only amount for 0 diff
+                    textClass = 'text-white';
+                }
+                
+                // Update DOM
+                differenceHeading.textContent = textHeading;
+                differenceHeading.classList.remove('text-yellow-400'); // Remove default yellow
+                differenceHeading.classList.add(textClass);
+                differenceOutput.value = textAmount;
+                differenceOutput.classList.add(textClass);
+                
+            } else {
+                differenceOutput.value = '0,00 €';
+                differenceOutput.classList.add('text-white');
+            }
+        }
+        
+        /**
+         * Runs all calculations.
+         */
+        function calculateAll() {
+            calculateGas();
+            calculateEv();
+            calculateDifference();
+        }
+
+        /**
+         * Runs all calculations and saves the settings.
+         */
+        function calculateAndSave() {
+            calculateAll();
+            saveDataToLocalStorage();
+        }
+    </script>
+</body>
+</html>
