@@ -74,8 +74,8 @@
                     <input type="text" id="fuelPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
                 </div>
                 <div>
-                    <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Geschätzte Kosten</label>
-                    <input type="text" id="euroOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0,00 €">
+                    <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
+                    <input type="text" id="euroOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0">
                 </div>
             </div>
 
@@ -90,14 +90,14 @@
                     <input type="text" id="kwhPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 0,36">
                 </div>
                 <div>
-                    <label for="euroOutputEv" class="block text-xs font-medium text-gray-400 mb-1">Geschätzte Kosten</label>
-                    <input type="text" id="euroOutputEv" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0,00 €">
+                    <label for="euroOutputEv" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
+                    <input type="text" id="euroOutputEv" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0">
                 </div>
             </div>
         </div>
 
         <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-2 difference-stacked">
-            <p id="differenceHeading" class="text-sm font-bold text-yellow-400 uppercase text-center block mb-1">Differenz</p>
+            <p id="differenceHeading" class="text-sm font-bold text-yellow-400 uppercase text-center block mb-1">Differenz in €</p>
             <input type="text" id="differenceOutput" readonly class="w-full p-2 text-xl text-center rounded-md bg-black text-white font-bold cursor-not-allowed transition-colors" placeholder="Ersparnis wird berechnet...">
         </div>
         </div>
@@ -151,7 +151,6 @@
          */
         function formatToGermanString(num, decimals) {
             if (typeof num !== 'number' || isNaN(num)) return '';
-            // Nutzt die integrierte deutsche Intl.NumberFormat-Unterstützung für Tausenderpunkte
             return new Intl.NumberFormat('de-DE', {
                 minimumFractionDigits: decimals,
                 maximumFractionDigits: decimals
@@ -173,7 +172,7 @@
             kwhConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
             fuelPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
             kwhPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
-            kmInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
+            kmInput.addEventListener('blur', (e) => formatNumericInput(e, 0)); // Kilometer ohne Dezimalstellen
         }
 
         /**
@@ -188,7 +187,7 @@
                     fuelPriceInput.value = formatToGermanString(data.fuelPrice || DEFAULT_FUEL_PRICE, 2);
                     kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
                     kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
-                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 2) : ''; 
+                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : ''; // Ohne Dezimalstellen geladen
                     console.log("Daten aus dem lokalen Speicher geladen.");
                 } else {
                     setAllDefaults();
@@ -216,7 +215,6 @@
             const value = parseGermanFloat(input.value);
             if (!isNaN(value)) {
                 const formattedValue = formatToGermanString(value, decimals);
-                // Nur aktualisieren und neu berechnen, wenn sich der Wert geändert hat
                 if (input.value && input.value !== formattedValue) {
                     input.value = formattedValue;
                     calculateAndSave();
@@ -254,7 +252,7 @@
             if (!isNaN(kmValue) && !isNaN(fuelConsumption) && !isNaN(fuelPrice) && fuelConsumption > 0 && fuelPrice > 0) {
                 const totalLiters = (kmValue / 100) * fuelConsumption;
                 const totalCost = totalLiters * fuelPrice;
-                euroOutput.value = formatToGermanString(totalCost, 2) + " €";
+                euroOutput.value = formatToGermanString(totalCost, 0);
             } else {
                 euroOutput.value = '';
             }
@@ -271,7 +269,7 @@
             if (!isNaN(kmValue) && !isNaN(kwhConsumption) && !isNaN(kwhPrice) && kwhConsumption > 0 && kwhPrice > 0) {
                 const totalKwh = (kmValue / 100) * kwhConsumption;
                 const totalCost = totalKwh * kwhPrice;
-                euroOutputEv.value = formatToGermanString(totalCost, 2) + " €";
+                euroOutputEv.value = formatToGermanString(totalCost, 0);
             } else {
                 euroOutputEv.value = '';
             }
@@ -284,14 +282,14 @@
             const costGasStr = euroOutput.value;
             const costEvStr = euroOutputEv.value;
 
-            const costGas = parseGermanFloat(costGasStr.replace('€', '').trim());
-            const costEv = parseGermanFloat(costEvStr.replace('€', '').trim());
+            const costGas = parseGermanFloat(costGasStr);
+            const costEv = parseGermanFloat(costEvStr);
 
             // Reset classes and default heading
             differenceOutput.classList.remove('text-green-400', 'text-blue-400', 'text-white');
             differenceHeading.classList.remove('text-green-400', 'text-blue-400', 'text-yellow-400');
-            differenceHeading.textContent = 'Differenz'; // Reset heading text
-            differenceHeading.classList.add('text-yellow-400'); // Default color for "Differenz"
+            differenceHeading.textContent = 'Differenz in €'; 
+            differenceHeading.classList.add('text-yellow-400'); 
 
             if (!isNaN(costGas) && !isNaN(costEv)) {
                 const diff = Math.abs(costGas - costEv);
@@ -299,7 +297,6 @@
                 let textHeading;
                 let textClass;
 
-                // Calculate the percentage saving based on the higher cost
                 const higherCost = Math.max(costGas, costEv);
                 let percentageText = '';
                 if (higherCost > 0 && diff > 0) {
@@ -307,29 +304,28 @@
                     percentageText = ` (${formatToGermanString(percentageSaving, 1)}%)`; 
                 }
                 
-                textAmount = formatToGermanString(diff, 2) + ' €' + percentageText;
+                textAmount = formatToGermanString(diff, 0) + percentageText;
 
                 if (costGas < costEv) {
-                    textHeading = `Ersparnis Verbrenner`;
+                    textHeading = `Ersparnis Verbrenner in €`;
                     textClass = 'text-blue-400';
                 } else if (costEv < costGas) {
-                    textHeading = `Ersparnis Elektro`;
+                    textHeading = `Ersparnis Elektro in €`;
                     textClass = 'text-green-400';
                 } else {
-                    textHeading = "Kein Kostenunterschied";
-                    textAmount = formatToGermanString(diff, 2) + " €"; // Only amount for 0 diff
+                    textHeading = "Kein Kostenunterschied in €";
+                    textAmount = formatToGermanString(diff, 0); 
                     textClass = 'text-white';
                 }
                 
-                // Update DOM
                 differenceHeading.textContent = textHeading;
-                differenceHeading.classList.remove('text-yellow-400'); // Remove default yellow
+                differenceHeading.classList.remove('text-yellow-400'); 
                 differenceHeading.classList.add(textClass);
                 differenceOutput.value = textAmount;
                 differenceOutput.classList.add(textClass);
                 
             } else {
-                differenceOutput.value = '0,00 €';
+                differenceOutput.value = '0';
                 differenceOutput.classList.add('text-white');
             }
         }
