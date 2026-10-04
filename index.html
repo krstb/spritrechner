@@ -71,7 +71,7 @@
                 </div>
                 <div>
                     <label for="fuelPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / l)</label>
-                    <input type="text" id="fuelPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 1,60">
+                    <input type="text" id="fuelPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
                 </div>
                 <div>
                     <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Geschätzte Kosten</label>
@@ -137,20 +137,25 @@
          */
         function parseGermanFloat(str) {
             if (typeof str !== 'string') return NaN;
-            // Erlaubt sowohl Punkt als auch Komma als Eingabe, behandelt aber leere Strings als NaN
-            if (str.trim() === '') return NaN;
-            return parseFloat(str.replace(',', '.'));
+            // Entfernt Tausenderpunkte und ersetzt Komma durch Punkt
+            const cleaned = str.replace(/\./g, '').replace(',', '.');
+            if (cleaned.trim() === '') return NaN;
+            return parseFloat(cleaned);
         }
 
         /**
-         * Formats a number into a string with a comma as a decimal separator.
+         * Formats a number into a string with a comma as a decimal separator and thousand separators.
          * @param {number} num The number to format.
          * @param {number} decimals The number of decimal places.
          * @returns {string} The formatted string.
          */
         function formatToGermanString(num, decimals) {
             if (typeof num !== 'number' || isNaN(num)) return '';
-            return num.toFixed(decimals).replace('.', ',');
+            // Nutzt die integrierte deutsche Intl.NumberFormat-Unterstützung für Tausenderpunkte
+            return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            }).format(num);
         }
 
         /**
@@ -183,7 +188,7 @@
                     fuelPriceInput.value = formatToGermanString(data.fuelPrice || DEFAULT_FUEL_PRICE, 2);
                     kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
                     kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
-                    kmInput.value = formatToGermanString(data.km || '', 2); // Load the saved kilometers
+                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 2) : ''; 
                     console.log("Daten aus dem lokalen Speicher geladen.");
                 } else {
                     setAllDefaults();
@@ -225,7 +230,7 @@
         function saveDataToLocalStorage() {
             try {
                 const dataToSave = {
-                    km: parseGermanFloat(kmInput.value) || null, // Save the kilometers
+                    km: parseGermanFloat(kmInput.value) || null,
                     fuelConsumption: parseGermanFloat(fuelConsumptionInput.value) || null,
                     fuelPrice: parseGermanFloat(fuelPriceInput.value) || null,
                     kwhConsumption: parseGermanFloat(kwhConsumptionInput.value) || null,
