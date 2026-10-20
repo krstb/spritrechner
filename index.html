@@ -113,7 +113,7 @@
         const kwhConsumptionInput = document.getElementById('kwhConsumption');
         const kwhPriceInput = document.getElementById('kwhPrice');
         const euroOutputEv = document.getElementById('euroOutputEv');
-        // Differenz (MODIFIED)
+        // Differenz
         const differenceOutput = document.getElementById('differenceOutput');
         const differenceHeading = document.getElementById('differenceHeading');
 
@@ -122,7 +122,36 @@
         const DEFAULT_FUEL_PRICE = 1.60;
         const DEFAULT_KWH_CONSUMPTION = 30.0;
         const DEFAULT_KWH_PRICE = 0.36;
-        
+
+        function handleInput(e) {
+            let cursorPosition = e.target.selectionStart;
+            let originalValue = e.target.value;
+            
+            // Ersetze alle Punkte durch Kommas und erlaube nur Ziffern und Kommas
+            let normalizedValue = originalValue.replace(/\./g, ',');
+            let cleanValue = normalizedValue.replace(/[^0-9,]/g, '');
+            
+            // Verhindere mehr als ein Komma
+            const parts = cleanValue.split(',');
+            if (parts.length > 2) {
+                cleanValue = parts[0] + ',' + parts.slice(1).join('');
+            }
+            
+            e.target.value = cleanValue;
+            
+            // Cursor-Position korrigieren, damit er beim Tippen nicht springt
+            if (originalValue !== cleanValue) { 
+                cursorPosition = cursorPosition + (cleanValue.length - originalValue.length); 
+            }
+            try {
+                e.target.setSelectionRange(cursorPosition, cursorPosition);
+            } catch (err) {
+                // Ignorieren, falls das Element den Fokus verliert
+            }
+            
+            calculateAndSave();
+        }
+
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             loadDataFromLocalStorage();
@@ -161,11 +190,11 @@
          * Adds event listeners to the input fields.
          */
         function addEventListeners() {
-            kmInput.addEventListener('input', calculateAndSave);
-            fuelConsumptionInput.addEventListener('input', calculateAndSave);
-            fuelPriceInput.addEventListener('input', calculateAndSave);
-            kwhConsumptionInput.addEventListener('input', calculateAndSave);
-            kwhPriceInput.addEventListener('input', calculateAndSave);
+            kmInput.addEventListener('input', handleInput);
+            fuelConsumptionInput.addEventListener('input', handleInput);
+            fuelPriceInput.addEventListener('input', handleInput);
+            kwhConsumptionInput.addEventListener('input', handleInput);
+            kwhPriceInput.addEventListener('input', handleInput);
             
             // Add blur listeners for auto-formatting
             fuelConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
@@ -187,7 +216,7 @@
                     fuelPriceInput.value = formatToGermanString(data.fuelPrice || DEFAULT_FUEL_PRICE, 2);
                     kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
                     kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
-                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : ''; // Ohne Dezimalstellen geladen
+                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : ''; 
                     console.log("Daten aus dem lokalen Speicher geladen.");
                 } else {
                     setAllDefaults();
@@ -276,7 +305,7 @@
         }
 
         /**
-         * Calculates and displays the difference between the two costs. (MODIFIED)
+         * Calculates and displays the difference between the two costs.
          */
         function calculateDifference() {
             const costGasStr = euroOutput.value;
