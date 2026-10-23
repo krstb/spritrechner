@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spritrechner</title>
-
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png"> 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -13,7 +12,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" href="icon-192.png">
-
     <script>
       // Service Worker Registrierung
       if ('serviceWorker' in navigator) {
@@ -23,19 +21,18 @@
         });
       }
     </script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         /* Fix für PWA-Ränder und den blauen Balken */
-        html {background-color: #000000 !important;
-              overscroll-behavior-y: none;
+        html {
+            background-color: #000000 !important;
+            overscroll-behavior-y: none;
         }
-        
-        body {background-color: #42B600;
-            font-family: 'Inter', sans-serif;
-             }
+        body {
+            background-color: #42B600;
+            font-family: 'Inter', sans-serif; 
+        }
         /* Versteckt die Pfeile bei Nummern-Inputs */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
@@ -43,23 +40,22 @@
             margin: 0;
         }
         /* Definiert eine Klasse für die zentrierte, gestapelte Ansicht */
-        @media (max-width: 640px) { /* Tailwind's default 'sm' breakpoint */
+        @media (max-width: 640px) {
             .difference-stacked > input {
-                text-align: center !important; /* Zentriert den Text im Input-Feld */
+                text-align: center !important;
             }
         }
     </style>
 </head>
 <body class="text-white flex items-start justify-center min-h-screen p-4 pt-4" style="background-color: #42B600;">
-        <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-4 space-y-4 border-2 border-gray-700">
-        
+    <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-4 space-y-4 border-2 border-gray-700">
         <div class="text-center">
             <h1 class="text-2xl font-bold text-white">Spritrechner</h1>
         </div>
 
         <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg space-y-2">
             <label for="kmInput" class="text-xs font-bold text-gray-400">Gefahrene Strecke in km</label>
-            <input type="text" id="kmInput" inputmode="decimal" class="w-full p-2 text-lg rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors" placeholder="Kilometer (km)">
+            <input type="text" id="kmInput" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 text-lg rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors" placeholder="Kilometer (km)">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -67,11 +63,11 @@
                 <h2 class="text-lg font-bold text-blue-400 text-center">Verbrenner</h2>
                 <div>
                     <label for="fuelConsumption" class="block text-xs font-medium text-gray-400 mb-1">Verbr. (l / 100 km)</label>
-                    <input type="text" id="fuelConsumption" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 9,0">
+                    <input type="text" id="fuelConsumption" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 9,0">
                 </div>
                 <div>
                     <label for="fuelPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / l)</label>
-                    <input type="text" id="fuelPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
+                    <input type="text" id="fuelPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
                 </div>
                 <div>
                     <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
@@ -83,11 +79,11 @@
                 <h2 class="text-lg font-bold text-green-400 text-center">Elektro</h2>
                 <div>
                     <label for="kwhConsumption" class="block text-xs font-medium text-gray-400 mb-1">Verbr. (kWh / 100 km)</label>
-                    <input type="text" id="kwhConsumption" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 30,0">
+                    <input type="text" id="kwhConsumption" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 30,0">
                 </div>
                 <div>
                     <label for="kwhPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / kWh)</label>
-                    <input type="text" id="kwhPrice" inputmode="decimal" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 0,36">
+                    <input type="text" id="kwhPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 0,36">
                 </div>
                 <div>
                     <label for="euroOutputEv" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
@@ -100,7 +96,7 @@
             <p id="differenceHeading" class="text-sm font-bold text-yellow-400 uppercase text-center block mb-1">Differenz in €</p>
             <input type="text" id="differenceOutput" readonly class="w-full p-2 text-xl text-center rounded-md bg-black text-white font-bold cursor-not-allowed transition-colors" placeholder="Ersparnis wird berechnet...">
         </div>
-        </div>
+    </div>
 
     <script>
         // --- DOM Elements ---
@@ -123,33 +119,44 @@
         const DEFAULT_KWH_CONSUMPTION = 30.0;
         const DEFAULT_KWH_PRICE = 0.36;
 
+        // Wandelt getippte Punkte sofort in ein Komma um, lässt den Wert während der Eingabe unformatiert
         function handleInput(e) {
             let cursorPosition = e.target.selectionStart;
             let originalValue = e.target.value;
-            
-            // Ersetze alle Punkte durch Kommas und erlaube nur Ziffern und Kommas
+
+            // 1. Punkte in Kommas umwandeln
             let normalizedValue = originalValue.replace(/\./g, ',');
+
+            // 2. Nur Ziffern und Kommas zulassen
             let cleanValue = normalizedValue.replace(/[^0-9,]/g, '');
-            
-            // Verhindere mehr als ein Komma
+
+            // 3. Nur maximal ein Komma erlauben
             const parts = cleanValue.split(',');
             if (parts.length > 2) {
                 cleanValue = parts[0] + ',' + parts.slice(1).join('');
             }
-            
+
             e.target.value = cleanValue;
-            
-            // Cursor-Position korrigieren, damit er beim Tippen nicht springt
+
+            // 4. Cursor-Position anpassen
             if (originalValue !== cleanValue) { 
                 cursorPosition = cursorPosition + (cleanValue.length - originalValue.length); 
             }
             try {
                 e.target.setSelectionRange(cursorPosition, cursorPosition);
             } catch (err) {
-                // Ignorieren, falls das Element den Fokus verliert
+                // Ignorieren
             }
-            
+
             calculateAndSave();
+        }
+
+        // Entfernt Tausenderpunkte beim Anklicken für flüssiges Bearbeiten
+        function handleFocus(e) {
+            const rawValue = e.target.value.replace(/\./g, '');
+            if (rawValue) {
+                e.target.value = rawValue;
+            }
         }
 
         // --- Initialization ---
@@ -159,25 +166,13 @@
             calculateAll();
         });
 
-        /**
-         * Parses a string with a comma as a decimal separator into a float.
-         * @param {string} str The string to parse.
-         * @returns {number} The parsed float, or NaN if parsing fails.
-         */
         function parseGermanFloat(str) {
             if (typeof str !== 'string') return NaN;
-            // Entfernt Tausenderpunkte und ersetzt Komma durch Punkt
             const cleaned = str.replace(/\./g, '').replace(',', '.');
             if (cleaned.trim() === '') return NaN;
             return parseFloat(cleaned);
         }
 
-        /**
-         * Formats a number into a string with a comma as a decimal separator and thousand separators.
-         * @param {number} num The number to format.
-         * @param {number} decimals The number of decimal places.
-         * @returns {string} The formatted string.
-         */
         function formatToGermanString(num, decimals) {
             if (typeof num !== 'number' || isNaN(num)) return '';
             return new Intl.NumberFormat('de-DE', {
@@ -186,27 +181,22 @@
             }).format(num);
         }
 
-        /**
-         * Adds event listeners to the input fields.
-         */
         function addEventListeners() {
-            kmInput.addEventListener('input', handleInput);
-            fuelConsumptionInput.addEventListener('input', handleInput);
-            fuelPriceInput.addEventListener('input', handleInput);
-            kwhConsumptionInput.addEventListener('input', handleInput);
-            kwhPriceInput.addEventListener('input', handleInput);
+            const numericInputs = [kmInput, fuelConsumptionInput, fuelPriceInput, kwhConsumptionInput, kwhPriceInput];
             
-            // Add blur listeners for auto-formatting
+            numericInputs.forEach(input => {
+                input.addEventListener('input', handleInput);
+                input.addEventListener('focus', handleFocus);
+            });
+
+            // Formatierung erst nach der Eingabe (on blur)
             fuelConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
             kwhConsumptionInput.addEventListener('blur', (e) => formatNumericInput(e, 1));
             fuelPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
             kwhPriceInput.addEventListener('blur', (e) => formatNumericInput(e, 2));
-            kmInput.addEventListener('blur', (e) => formatNumericInput(e, 0)); // Kilometer ohne Dezimalstellen
+            kmInput.addEventListener('blur', (e) => formatNumericInput(e, 0));
         }
 
-        /**
-         * Loads saved settings from Local Storage.
-         */
         function loadDataFromLocalStorage() {
             try {
                 const savedData = localStorage.getItem('fuelCalculatorSettings');
@@ -217,18 +207,15 @@
                     kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
                     kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
                     kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : ''; 
-                    console.log("Daten aus dem lokalen Speicher geladen.");
                 } else {
                     setAllDefaults();
-                    console.log("Keine gespeicherten Daten gefunden, Standardwerte gesetzt.");
                 }
             } catch (error) {
                 console.error("Fehler beim Laden der Daten aus dem lokalen Speicher:", error);
                 setAllDefaults();
             }
         }
-        
-        /** Helper function to set all default values */
+
         function setAllDefaults() {
             fuelConsumptionInput.value = formatToGermanString(DEFAULT_FUEL_CONSUMPTION, 1);
             fuelPriceInput.value = formatToGermanString(DEFAULT_FUEL_PRICE, 2);
@@ -236,9 +223,6 @@
             kwhPriceInput.value = formatToGermanString(DEFAULT_KWH_PRICE, 2);
         }
 
-        /**
-         * Formats numeric inputs to a fixed number of decimal places on blur.
-         */
         function formatNumericInput(event, decimals) {
             const input = event.target;
             const value = parseGermanFloat(input.value);
@@ -251,9 +235,6 @@
             }
         }
 
-        /**
-         * Saves the current consumption and price settings to Local Storage.
-         */
         function saveDataToLocalStorage() {
             try {
                 const dataToSave = {
@@ -263,16 +244,12 @@
                     kwhConsumption: parseGermanFloat(kwhConsumptionInput.value) || null,
                     kwhPrice: parseGermanFloat(kwhPriceInput.value) || null,
                 };
-                
                 localStorage.setItem('fuelCalculatorSettings', JSON.stringify(dataToSave));
             } catch (error) {
                 console.error("Fehler beim Speichern der Daten im lokalen Speicher:", error);
             }
         }
 
-        /**
-         * Calculates costs for the combustion engine car.
-         */
         function calculateGas() {
             const kmValue = parseGermanFloat(kmInput.value);
             const fuelConsumption = parseGermanFloat(fuelConsumptionInput.value);
@@ -286,10 +263,7 @@
                 euroOutput.value = '';
             }
         }
-        
-        /**
-         * Calculates costs for the electric vehicle.
-         */
+
         function calculateEv() {
             const kmValue = parseGermanFloat(kmInput.value);
             const kwhConsumption = parseGermanFloat(kwhConsumptionInput.value);
@@ -304,9 +278,6 @@
             }
         }
 
-        /**
-         * Calculates and displays the difference between the two costs.
-         */
         function calculateDifference() {
             const costGasStr = euroOutput.value;
             const costEvStr = euroOutputEv.value;
@@ -314,7 +285,6 @@
             const costGas = parseGermanFloat(costGasStr);
             const costEv = parseGermanFloat(costEvStr);
 
-            // Reset classes and default heading
             differenceOutput.classList.remove('text-green-400', 'text-blue-400', 'text-white');
             differenceHeading.classList.remove('text-green-400', 'text-blue-400', 'text-yellow-400');
             differenceHeading.textContent = 'Differenz in €'; 
@@ -332,7 +302,6 @@
                     const percentageSaving = (diff / higherCost) * 100;
                     percentageText = ` (${formatToGermanString(percentageSaving, 1)}%)`; 
                 }
-                
                 textAmount = formatToGermanString(diff, 0) + percentageText;
 
                 if (costGas < costEv) {
@@ -346,31 +315,24 @@
                     textAmount = formatToGermanString(diff, 0); 
                     textClass = 'text-white';
                 }
-                
+
                 differenceHeading.textContent = textHeading;
                 differenceHeading.classList.remove('text-yellow-400'); 
                 differenceHeading.classList.add(textClass);
                 differenceOutput.value = textAmount;
                 differenceOutput.classList.add(textClass);
-                
             } else {
                 differenceOutput.value = '0';
                 differenceOutput.classList.add('text-white');
             }
         }
-        
-        /**
-         * Runs all calculations.
-         */
+
         function calculateAll() {
             calculateGas();
             calculateEv();
             calculateDifference();
         }
 
-        /**
-         * Runs all calculations and saves the settings.
-         */
         function calculateAndSave() {
             calculateAll();
             saveDataToLocalStorage();
