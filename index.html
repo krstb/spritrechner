@@ -258,7 +258,7 @@
             if (!isNaN(kmValue) && !isNaN(fuelConsumption) && !isNaN(fuelPrice) && fuelConsumption > 0 && fuelPrice > 0) {
                 const totalLiters = (kmValue / 100) * fuelConsumption;
                 const totalCost = totalLiters * fuelPrice;
-                euroOutput.value = formatToGermanString(totalCost, 0);
+                euroOutput.value = formatToGermanString(totalCost, 2); // Hier auf 2 Nachkommastellen geändert
             } else {
                 euroOutput.value = '';
             }
@@ -272,7 +272,7 @@
             if (!isNaN(kmValue) && !isNaN(kwhConsumption) && !isNaN(kwhPrice) && kwhConsumption > 0 && kwhPrice > 0) {
                 const totalKwh = (kmValue / 100) * kwhConsumption;
                 const totalCost = totalKwh * kwhPrice;
-                euroOutputEv.value = formatToGermanString(totalCost, 0);
+                euroOutputEv.value = formatToGermanString(totalCost, 2); // Hier auf 2 Nachkommastellen geändert
             } else {
                 euroOutputEv.value = '';
             }
@@ -302,7 +302,7 @@
                     const percentageSaving = (diff / higherCost) * 100;
                     percentageText = ` (${formatToGermanString(percentageSaving, 1)}%)`; 
                 }
-                textAmount = formatToGermanString(diff, 0) + percentageText;
+                textAmount = formatToGermanString(diff, 2) + percentageText; // Hier auf 2 Nachkommastellen geändert
 
                 if (costGas < costEv) {
                     textHeading = `Ersparnis Verbrenner in €`;
@@ -312,7 +312,7 @@
                     textClass = 'text-green-400';
                 } else {
                     textHeading = "Kein Kostenunterschied in €";
-                    textAmount = formatToGermanString(diff, 0); 
+                    textAmount = formatToGermanString(diff, 2); // Hier auf 2 Nachkommastellen geändert
                     textClass = 'text-white';
                 }
 
@@ -322,7 +322,7 @@
                 differenceOutput.value = textAmount;
                 differenceOutput.classList.add(textClass);
             } else {
-                differenceOutput.value = '0';
+                differenceOutput.value = formatToGermanString(0, 2); // Hier auf 2 Nachkommastellen geändert
                 differenceOutput.classList.add('text-white');
             }
         }
