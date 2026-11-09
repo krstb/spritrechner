@@ -217,6 +217,7 @@
         }
 
         function setAllDefaults() {
+            kmInput.value = formatToGermanString(10000, 0); // <-- Diese Zeile einfügen
             fuelConsumptionInput.value = formatToGermanString(DEFAULT_FUEL_CONSUMPTION, 1);
             fuelPriceInput.value = formatToGermanString(DEFAULT_FUEL_PRICE, 2);
             kwhConsumptionInput.value = formatToGermanString(DEFAULT_KWH_CONSUMPTION, 1);
