@@ -67,7 +67,7 @@
                 </div>
                 <div>
                     <label for="fuelPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / l)</label>
-                    <input type="text" id="fuelPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
+                    <input type="text" id="fuelPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 1,90">
                 </div>
                 <div>
                     <label for="litersOutput" class="block text-xs font-medium text-gray-400 mb-1">Verbrauch in Liter</label>
@@ -83,7 +83,7 @@
                 <h2 class="text-lg font-bold text-green-400 text-center">Elektro</h2>
                 <div>
                     <label for="kwhConsumption" class="block text-xs font-medium text-gray-400 mb-1">Verbr. (kWh / 100 km)</label>
-                    <input type="text" id="kwhConsumption" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 30,0">
+                    <input type="text" id="kwhConsumption" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 20,0">
                 </div>
                 <div>
                     <label for="kwhPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / kWh)</label>
@@ -125,8 +125,8 @@
 
         // --- Default values ---
         const DEFAULT_FUEL_CONSUMPTION = 9.0;
-        const DEFAULT_FUEL_PRICE = 1.60;
-        const DEFAULT_KWH_CONSUMPTION = 30.0;
+        const DEFAULT_FUEL_PRICE = 1.90;
+        const DEFAULT_KWH_CONSUMPTION = 20.0;
         const DEFAULT_KWH_PRICE = 0.36;
 
         // Wandelt getippte Punkte sofort in ein Komma um, lässt den Wert während der Eingabe unformatiert
