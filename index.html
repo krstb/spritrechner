@@ -70,6 +70,10 @@
                     <input type="text" id="fuelPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="z.B. 2,00">
                 </div>
                 <div>
+                    <label for="litersOutput" class="block text-xs font-medium text-gray-400 mb-1">Verbrauch in Liter</label>
+                    <input type="text" id="litersOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0">
+                </div>
+                <div>
                     <label for="euroOutput" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
                     <input type="text" id="euroOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0">
                 </div>
@@ -84,6 +88,10 @@
                 <div>
                     <label for="kwhPrice" class="block text-xs font-medium text-gray-400 mb-1">Preis (€ / kWh)</label>
                     <input type="text" id="kwhPrice" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="z.B. 0,36">
+                </div>
+                <div>
+                    <label for="kwhOutput" class="block text-xs font-medium text-gray-400 mb-1">Verbrauch in kWh</label>
+                    <input type="text" id="kwhOutput" readonly class="w-full p-2 rounded-md bg-gray-600 text-white font-bold cursor-not-allowed" placeholder="0">
                 </div>
                 <div>
                     <label for="euroOutputEv" class="block text-xs font-medium text-gray-400 mb-1">Kosten in €</label>
@@ -104,10 +112,12 @@
         // Verbrenner
         const fuelConsumptionInput = document.getElementById('fuelConsumption');
         const fuelPriceInput = document.getElementById('fuelPrice');
+        const litersOutput = document.getElementById('litersOutput');
         const euroOutput = document.getElementById('euroOutput');
         // Elektro
         const kwhConsumptionInput = document.getElementById('kwhConsumption');
         const kwhPriceInput = document.getElementById('kwhPrice');
+        const kwhOutput = document.getElementById('kwhOutput');
         const euroOutputEv = document.getElementById('euroOutputEv');
         // Differenz
         const differenceOutput = document.getElementById('differenceOutput');
@@ -206,7 +216,7 @@
                     fuelPriceInput.value = formatToGermanString(data.fuelPrice || DEFAULT_FUEL_PRICE, 2);
                     kwhConsumptionInput.value = formatToGermanString(data.kwhConsumption || DEFAULT_KWH_CONSUMPTION, 1);
                     kwhPriceInput.value = formatToGermanString(data.kwhPrice || DEFAULT_KWH_PRICE, 2);
-                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : ''; 
+                    kmInput.value = data.km !== null && data.km !== undefined ? formatToGermanString(data.km, 0) : formatToGermanString(10000, 0); 
                 } else {
                     setAllDefaults();
                 }
@@ -217,7 +227,7 @@
         }
 
         function setAllDefaults() {
-            kmInput.value = formatToGermanString(10000, 0); // <-- Diese Zeile einfügen
+            kmInput.value = formatToGermanString(10000, 0);
             fuelConsumptionInput.value = formatToGermanString(DEFAULT_FUEL_CONSUMPTION, 1);
             fuelPriceInput.value = formatToGermanString(DEFAULT_FUEL_PRICE, 2);
             kwhConsumptionInput.value = formatToGermanString(DEFAULT_KWH_CONSUMPTION, 1);
@@ -256,11 +266,18 @@
             const fuelConsumption = parseGermanFloat(fuelConsumptionInput.value);
             const fuelPrice = parseGermanFloat(fuelPriceInput.value);
 
-            if (!isNaN(kmValue) && !isNaN(fuelConsumption) && !isNaN(fuelPrice) && fuelConsumption > 0 && fuelPrice > 0) {
+            if (!isNaN(kmValue) && !isNaN(fuelConsumption) && fuelConsumption > 0) {
                 const totalLiters = (kmValue / 100) * fuelConsumption;
-                const totalCost = totalLiters * fuelPrice;
-                euroOutput.value = formatToGermanString(totalCost, 2); // Hier auf 2 Nachkommastellen geändert
+                litersOutput.value = formatToGermanString(totalLiters, 1); // Hier auf 1 Nachkommastelle gestellt
+                
+                if (!isNaN(fuelPrice) && fuelPrice > 0) {
+                    const totalCost = totalLiters * fuelPrice;
+                    euroOutput.value = formatToGermanString(totalCost, 2);
+                } else {
+                    euroOutput.value = '';
+                }
             } else {
+                litersOutput.value = '';
                 euroOutput.value = '';
             }
         }
@@ -270,11 +287,18 @@
             const kwhConsumption = parseGermanFloat(kwhConsumptionInput.value);
             const kwhPrice = parseGermanFloat(kwhPriceInput.value);
 
-            if (!isNaN(kmValue) && !isNaN(kwhConsumption) && !isNaN(kwhPrice) && kwhConsumption > 0 && kwhPrice > 0) {
+            if (!isNaN(kmValue) && !isNaN(kwhConsumption) && kwhConsumption > 0) {
                 const totalKwh = (kmValue / 100) * kwhConsumption;
-                const totalCost = totalKwh * kwhPrice;
-                euroOutputEv.value = formatToGermanString(totalCost, 2); // Hier auf 2 Nachkommastellen geändert
+                kwhOutput.value = formatToGermanString(totalKwh, 1); // Hier auf 1 Nachkommastelle gestellt
+
+                if (!isNaN(kwhPrice) && kwhPrice > 0) {
+                    const totalCost = totalKwh * kwhPrice;
+                    euroOutputEv.value = formatToGermanString(totalCost, 2);
+                } else {
+                    euroOutputEv.value = '';
+                }
             } else {
+                kwhOutput.value = '';
                 euroOutputEv.value = '';
             }
         }
@@ -303,7 +327,7 @@
                     const percentageSaving = (diff / higherCost) * 100;
                     percentageText = ` (${formatToGermanString(percentageSaving, 1)}%)`; 
                 }
-                textAmount = formatToGermanString(diff, 2) + percentageText; // Hier auf 2 Nachkommastellen geändert
+                textAmount = formatToGermanString(diff, 2) + percentageText;
 
                 if (costGas < costEv) {
                     textHeading = `Ersparnis Verbrenner in €`;
@@ -313,7 +337,7 @@
                     textClass = 'text-green-400';
                 } else {
                     textHeading = "Kein Kostenunterschied in €";
-                    textAmount = formatToGermanString(diff, 2); // Hier auf 2 Nachkommastellen geändert
+                    textAmount = formatToGermanString(diff, 2);
                     textClass = 'text-white';
                 }
 
@@ -323,7 +347,7 @@
                 differenceOutput.value = textAmount;
                 differenceOutput.classList.add(textClass);
             } else {
-                differenceOutput.value = formatToGermanString(0, 2); // Hier auf 2 Nachkommastellen geändert
+                differenceOutput.value = formatToGermanString(0, 2);
                 differenceOutput.classList.add('text-white');
             }
         }
